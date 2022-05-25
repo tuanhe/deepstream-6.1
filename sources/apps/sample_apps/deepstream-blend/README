@@ -1,0 +1,73 @@
+*****************************************************************************
+* Copyright (c) 2021-2022 NVIDIA Corporation.  All rights reserved.
+*
+* NVIDIA Corporation and its licensors retain all intellectual property
+* and proprietary rights in and to this software, related documentation
+* and any modifications thereto.  Any use, reproduction, disclosure or
+* distribution of this software and related documentation without an express
+* license agreement from NVIDIA Corporation is strictly prohibited.
+*****************************************************************************
+
+*****************************************************************************
+                     deepstream-nvblender-app
+                            README
+*****************************************************************************
+
+===============================================================================
+1. Prerequisites:
+===============================================================================
+
+Please follow instructions in the apps/sample_apps/deepstream-app/README on how
+to install the prequisites for Deepstream SDK, the DeepStream SDK itself and the
+apps.
+
+You must have the following development packages installed
+   GStreamer-1.0
+   GStreamer-1.0 Base Plugins
+   GStreamer-1.0 gstrtspserver
+   X11 client-side library
+   Maxine Docker
+
+To install these packages, execute the following command:
+   sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev \
+   libgstrtspserver-1.0-dev libx11-dev
+For Maxine docker installation refer:
+https://gitlab-master.nvidia.com/nbx-server/nbxperf
+
+===============================================================================
+2. Purpose:
+===============================================================================
+
+This document shall describe about the sample deepstream-nvblender-app application.
+
+It is meant to demonstrate, how to use the various DeepStream SDK
+elements in the pipeline and blend 2 video streams.
+
+This sample creates instance of "nvblender" element. nvblender blends 2 input
+video sources which can then be rendered.
+
+===============================================================================
+3. To compile:
+===============================================================================
+
+$ Set CUDA_VER in the MakeFile as per platform.
+    For Jetson, CUDA_VER=11.4
+    For x86, CUDA_VER=11.6
+$ sudo make
+
+===============================================================================
+4. Usage:
+===============================================================================
+
+  $ cd apps/deepstream-blend/
+  $ make
+  $ ./deepstream-nvblender-app <fg=uri1> [fg=uri2] ... [fg=uriN] <bg=uri1> [bg=uri2] ... [bg=uriN]
+
+Eg:
+USE_NEW_NVSTREAMMUX=yes ./deepstream-nvblender-app fg=file:///opt/nvidia/deepstream/deepstream/samples/streams/1.mp4 bg=file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.mp4 fg=file:///opt/nvidia/deepstream/deepstream/samples/streams/2.mp4 bg=file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.mp4
+
+In this sample, the foreground stream (fg=) is passed through AI model engine to extract Alpha matt
+of human in the stream and create stream based on this . This acts as one input of the
+blender component. Background Stream (bg=) is other input of blender component which then blends both
+these streams to give a virtual background effect on the final video.
+Tiler component will be used to blend more than 1 Forground and background streams

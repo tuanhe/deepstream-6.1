@@ -1,0 +1,51 @@
+%YAML 1.2
+################################################################################
+# Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+################################################################################
+
+---
+# Configuration file for DeepStream ASR Sample Application
+
+# Configuration for source0
+source0 :
+  # uri: URI of the input stream
+  uri : "file://streams/1272-135031-0000.wav"
+
+# Configuration for sink0
+sink0 :
+  # enable_playback: Enable playback of decoded audio content.
+  # 0: Playback disabled (Default)
+  # 1: Playback enabled
+  enable_playback : 1
+
+  # asr_output_file_name: Name of the text file for writing asr output
+  asr_output_file_name : asr0.txt
+
+  # sync: Indicates how fast the audio stream is to be rendered.
+  # 0: As fast as possible (Default)
+  # 1: Synchronously
+  sync : 1
+
+# Configuration for source1
+# ...
+# Configuration for sink1
+# ...
+

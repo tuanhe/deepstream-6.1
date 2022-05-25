@@ -1,0 +1,95 @@
+*****************************************************************************
+* Copyright (c) 2022 NVIDIA Corporation.  All rights reserved.
+*
+* NVIDIA Corporation and its licensors retain all intellectual property
+* and proprietary rights in and to this software, related documentation
+* and any modifications thereto.  Any use, reproduction, disclosure or
+* distribution of this software and related documentation without an express
+* license agreement from NVIDIA Corporation is strictly prohibited.
+*****************************************************************************
+
+*****************************************************************************
+                     deepstream-ucx-test1-app
+                             README
+*****************************************************************************
+
+===============================================================================
+1. Prerequisites:
+===============================================================================
+
+Please follow instructions in the apps/sample_apps/deepstream-app/README on how
+to install the prequisites for Deepstream SDK, the DeepStream SDK itself and the
+apps. Also, please read the information about the Gst-NvDsUcx plugin within the
+Deepstream SDK.
+
+This test requires the availability of an NVIDIA ConnectX-6 DX or later NIC.
+For more information on installing and configuring NICs, please see:
+https://docs.nvidia.com/networking/display/ConnectX6VPI/Introduction
+
+To be able to run the test over an RDMA-enabled network, please
+ensure you have also installed the RDMA OFED network stack from here:
+https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/. The
+installation instructions can be found here:
+https://docs.nvidia.com/networking/display/MLNXOFEDv551032/Installing+MLNX_OFED.
+
+Also, install the Unified Communication-X Library from here:
+https://github.com/openucx/ucx. The installation instructions are mentioned here:
+https://github.com/openucx/ucx#release-builds. Please note, that UCX library
+should be compiled with CUDA support by adding the --with-cuda=<path/to/cuda> 
+to the configure command:
+
+$ ./contrib/configure-release --prefix=/install/path --with-cuda=/path/to/cuda
+
+You must have the following development packages installed
+   GStreamer-1.0
+   GStreamer-1.0 Base Plugins
+   GStreamer-1.0 gstrtspserver
+   X11 client-side library
+
+To install these packages, execute the following command:
+   sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev \
+   libgstrtspserver-1.0-dev libx11-dev
+
+===============================================================================
+2. Purpose:
+===============================================================================
+This documents describes the sample deepstream-ucx-test1 application.
+
+The deepstream-ucx-test1 application is meant for a simple demonstration of how to
+use the new communication plugin called nvdsgst_ucx with the Deepstream SDK.
+
+===============================================================================
+3. To compile:
+===============================================================================
+
+  $ Set CUDA_VER to 11.6 for x86.
+  $ sudo make
+
+Note, the nvdsgst_ucx plugin is not supported on Jetson.
+
+===============================================================================
+4. Usage:
+===============================================================================
+
+To run:
+  1. Run the server application first. Required parameters (in order) are the
+     IP address of server, Port, Height of frame in video, Width of frame in video,
+     URI of video file. For example,
+
+    $  ./deepstream-ucx-test1-app-server 192.168.100.1 4000 1920 1080 file:////root/image1.mp4
+
+  2. Run the client application next. Required parameters (in order) are the
+     IP address of server, Port on server, Height of frame in video, Width of frame in video,
+     Location where to save the output file. For example,
+
+    $ ./deepstream-ucx-test1-app-client 192.168.100.1 4000 1920 1080 /path/to/save/file.mp4
+
+NOTE: To compile the sources, run make with "sudo" or root permission.
+
+The Deepstream pipeline here consists of the streammux plugin that takes input from the
+uridecoder. The streammux passes the frames along with the required metadata to the
+nvdsgst_ucx plugin. Here, we show the server side of the plugin that acts as a sink
+and sends the data to the client which acts as a source for the remaining pipeline.
+The server sends the data to the client using the RDMA network for better performance.
+The client forwards the data to the streamdemux plugin, video converter, h264 encoder,
+h264 parser, qtmux and finally the filesink plugin creates the output file.

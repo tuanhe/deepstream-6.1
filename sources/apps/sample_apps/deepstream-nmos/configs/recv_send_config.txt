@@ -1,0 +1,54 @@
+################################################################################
+# Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+################################################################################
+
+[application]
+seed=DS-NMOS
+host-name=dsnode-3.local
+http-port=8080
+
+[receiver0]
+enable=1
+#Type - 1=OSS UDPsrc 2=Nvidia UDPsrc
+type=1
+sdp-file=recv_sdp_video.txt
+#Type - 1=OSS UDPsink 2=Nvidia UDPsink
+sink-type=1
+sink-sdp-file=sender_sdp_video.txt
+# Additional parameters for video with Nvidia UDPsink
+# Refer README to calculate these values.
+# size of RTP packet (including RTP header)
+#payload-size=1220
+# Number of RTP packets per line
+#packets-per-line=4
+
+[receiver1]
+enable=1
+#Type - 1=OSS UDPsrc 2=Nvidia UDPsrc
+type=1
+sdp-file=recv_sdp_audio.txt
+#Type - 1=OSS UDPsink 2=Nvidia UDPsink
+sink-type=1
+sink-sdp-file=sender_sdp_audio.txt
+
+[primary-gie]
+enable=1
+config-file=config_infer_primary.txt
