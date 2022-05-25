@@ -1,0 +1,6 @@
+lib/
+bin
+*.so
+*.mov
+*.mp4
+*.wav
