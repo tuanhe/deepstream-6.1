@@ -51,13 +51,14 @@ list(APPEND ds_app_sources ${ds_app_source_files}
 add_executable(${CMAKE_PROJECT_NAME} ${ds_app_sources})
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${DSAPP_LIBRARIES}
-                                                     -lcudart 
-                                                     -lnvdsgst_meta 
-                                                     -lnvds_meta 
-                                                     -lnvdsgst_helper
-	                                                 -lnvdsgst_smartrecord 
-                                                     -lnvds_utils 
-                                                     -lnvds_msgbroker 
-                                                     -lm -lyaml-cpp
-                                                     -lcuda 
-                                                     -lgstrtspserver-1.0)
+                                                     cudart 
+                                                     nvdsgst_meta 
+                                                     nvds_meta 
+                                                     nvdsgst_helper
+                                                     nvdsgst_smartrecord 
+                                                     nvds_utils 
+                                                     nvds_msgbroker 
+                                                     m
+                                                     yaml-cpp
+                                                     cuda
+                                                     gstrtspserver-1.0)
