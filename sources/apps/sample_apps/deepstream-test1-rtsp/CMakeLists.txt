@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(deepstream-app)
+project(deepstream-test1-rtsp)
 
 set(CUDA_VER 11.6)
 set(NVDS_VERSION 6.1)
@@ -23,15 +23,13 @@ elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif()
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(DSAPP REQUIRED gstreamer-1.0 gstreamer-video-1.0 x11 json-glib-1.0)
+pkg_check_modules(DSAPP REQUIRED gstreamer-1.0)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/../../apps-common/includes
         ${PROJECT_SOURCE_DIR}/../../../includes
         /usr/local/cuda-${CUDA_VER}/include
         ${DSAPP_INCLUDE_DIRS}
-        /usr/lib/${CMAKE_HOST_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include
 )
 
 link_directories(
@@ -40,8 +38,8 @@ link_directories(
 )
 
 AUX_SOURCE_DIRECTORY(.  ds_app_source_files)
-AUX_SOURCE_DIRECTORY(../../apps-common/src  ds_app_common_source_files)
-AUX_SOURCE_DIRECTORY(../../apps-common/src/deepstream-yaml  ds_app_common_yaml_source_files)
+#AUX_SOURCE_DIRECTORY(../../apps-common/src  ds_app_common_source_files)
+#AUX_SOURCE_DIRECTORY(../../apps-common/src/deepstream-yaml  ds_app_common_yaml_source_files)
 
 list(APPEND ds_app_sources ${ds_app_source_files} 
                            ${ds_app_common_source_files}
@@ -60,4 +58,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${DSAPP_LIBRARIES}
                                                      m
                                                      yaml-cpp
                                                      cuda
-                                                     gstrtspserver-1.0)
+                                                     gstrtspserver-1.0
+                                                     nvds_yml_parser)
