@@ -236,7 +236,7 @@ main (int argc, char *argv[])
   
   GstElement *nvvidconv_postosd = NULL, *filter = NULL,
              *encoder = NULL, *rtppay = NULL;
-
+  
   GstElement *transform = NULL;
   GstBus *bus = NULL;
   guint bus_watch_id;
@@ -298,8 +298,8 @@ main (int argc, char *argv[])
       g_object_set (G_OBJECT (filter), "caps", caps4, NULL);
       gst_caps_unref (caps4);
 
-  encoder = gst_element_factory_make ("encoder", "h264 encoder");
-
+  encoder = gst_element_factory_make ("x264enc", "h264 encoder");
+  
   rtppay = gst_element_factory_make ("rtph264pay", "rtp-payer");
   
   sink = gst_element_factory_make ("udpsink", "udp-sink");
