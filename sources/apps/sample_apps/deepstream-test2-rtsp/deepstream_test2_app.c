@@ -484,28 +484,23 @@ main (int argc, char *argv[])
                                                     encoder, 
                                                     rtppay);
       return -1;}
-  /* Finally render the osd output */
-  if(prop.integrated) {
-      transform = gst_element_factory_make ("nvegltransform", "nvegl-transform");
-  }
 
   #else
-
   /* Finally render the osd output */
   if(prop.integrated) {
     transform = gst_element_factory_make ("nvegltransform", "nvegl-transform");
   }
   sink = gst_element_factory_make ("nveglglessink", "nvvideo-renderer");
+  
+  if(!transform && prop.integrated) {
+      g_printerr ("One tegra element could not be created. Exiting.\n");
+      return -1;
+  }
   #endif
   if (!source || !h264parser || !decoder || !pgie ||
       !nvtracker || !sgie1 || !sgie2 || !sgie3 || !nvvidconv || !nvosd || !sink) {
     g_printerr ("One element could not be created. Exiting.\n");
     return -1;
-  }
-
-  if(!transform && prop.integrated) {
-      g_printerr ("One tegra element could not be created. Exiting.\n");
-      return -1;
   }
 
   if (g_str_has_suffix (argv[1], ".h264")) {
@@ -560,23 +555,22 @@ main (int argc, char *argv[])
   /* Set up the pipeline */
   /* we add all elements into the pipeline */
   /* decoder | pgie1 | nvtracker | sgie1 | sgie2 | sgie3 | etc.. */
+  #if RTSP
+  gst_bin_add_many (GST_BIN (pipeline),
+        source, h264parser, decoder, streammux, pgie, nvtracker, sgie1, sgie2, sgie3,
+        nvvidconv, nvosd, 
+        nvvidconv_postosd, filter, encoder, rtppay, sink, NULL);
+  #else    
   if(prop.integrated) {
     gst_bin_add_many (GST_BIN (pipeline),
         source, h264parser, decoder, streammux, pgie, nvtracker, sgie1, sgie2, sgie3,
         nvvidconv, nvosd, transform, sink, NULL);
-  }
-  else {
-     #if RTSP
-    gst_bin_add_many (GST_BIN (pipeline),
-        source, h264parser, decoder, streammux, pgie, nvtracker, sgie1, sgie2, sgie3,
-        nvvidconv, nvosd, 
-        nvvidconv_postosd, filter, encoder, rtppay, sink, NULL);
-    #else    
+  }else {
     gst_bin_add_many (GST_BIN (pipeline),
         source, h264parser, decoder, streammux, pgie, nvtracker, sgie1, sgie2, sgie3,
         nvvidconv, nvosd, sink, NULL);
-    #endif
   }
+  #endif
 
   GstPad *sinkpad, *srcpad;
   gchar pad_name_sink[16] = "sink_0";
@@ -608,6 +602,14 @@ main (int argc, char *argv[])
     return -1;
   }
 
+    #if RTSP
+    if (!gst_element_link_many (streammux, pgie, nvtracker, sgie1, 
+        sgie2, sgie3,nvvidconv, nvosd, 
+        nvvidconv_postosd, filter, encoder, rtppay, sink,NULL)) {
+            g_printerr ("Elements could not be linked: 3. Exiting.\n");
+            return -1;
+    }
+  #else  
   if(prop.integrated) {
     if (!gst_element_link_many (streammux, pgie, nvtracker, sgie1,
         sgie2, sgie3, nvvidconv, nvosd, transform, sink, NULL)) {
@@ -616,21 +618,13 @@ main (int argc, char *argv[])
     }
   }
   else {
-  #if RTSP
-    if (!gst_element_link_many (streammux, pgie, nvtracker, sgie1, 
-        sgie2, sgie3,nvvidconv, nvosd, 
-        nvvidconv_postosd, filter, encoder, rtppay, sink,NULL)) {
-            g_printerr ("Elements could not be linked: 3. Exiting.\n");
-            return -1;
-    }
-  #else  
     if (!gst_element_link_many (streammux, pgie, nvtracker, sgie1,
         sgie2, sgie3, nvvidconv, nvosd, sink, NULL)) {
       g_printerr ("Elements could not be linked. Exiting.\n");
       return -1;
     }
-  #endif
   }
+  #endif
 
   /* rtsp init */
   rtsp_server_init(encoder, sink);
