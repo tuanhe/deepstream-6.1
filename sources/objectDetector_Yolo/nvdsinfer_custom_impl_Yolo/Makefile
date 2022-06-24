@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
 
-CUDA_VER?=
+CUDA_VER?=11.4
 ifeq ($(CUDA_VER),)
   $(error "CUDA_VER is not set")
 endif
@@ -36,6 +36,7 @@ LFLAGS:= -shared -Wl,--start-group $(LIBS) -Wl,--end-group
 INCS:= $(wildcard *.h)
 SRCFILES:= nvdsinfer_yolo_engine.cpp \
            nvdsparsebbox_Yolo.cpp   \
+           nvdsparsebbox_YoloV5.cpp   \
            yoloPlugins.cpp    \
            trt_utils.cpp              \
            yolo.cpp              \
