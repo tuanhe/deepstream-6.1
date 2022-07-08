@@ -62,11 +62,12 @@ gpu-id=0
 net-scale-factor=0.0039215697906911373
 #0=RGB, 1=BGR
 model-color-format=0
-model-engine-file=yolov5s.engine
+model-engine-file=v5s_6.0_int8.engine
+#model-engine-file=yolov5s.engine
 labelfile-path=labels.txt
 #int8-calib-file=yolov3-calibration.table.trt7.0
 ## 0=FP32, 1=INT8, 2=FP16 mode
-network-mode=0
+network-mode=1
 num-detected-classes=80
 gie-unique-id=1
 network-type=0
