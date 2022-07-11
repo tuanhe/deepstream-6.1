@@ -4,3 +4,7 @@ bin
 *.mov
 *.mp4
 *.wav
+*.engine
+*.o
+*.a
+build
