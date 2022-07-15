@@ -25,7 +25,7 @@
 
 #include <gst/gst.h>
 #include <gst/base/gstbasetransform.h>
-#include "gstdsrclpublisher.h"
+#include "dsrcl/gstdsrclpublisher.h"
 
 GST_DEBUG_CATEGORY_STATIC (gst_dsrclpublisher_debug_category);
 #define GST_CAT_DEFAULT gst_dsrclpublisher_debug_category
@@ -128,8 +128,8 @@ gst_dsrclpublisher_class_init (GstDsRclPublisherClass * klass)
       &gst_dsrclpublisher_sink_template);
 
   gst_element_class_set_static_metadata (GST_ELEMENT_CLASS(klass),
-      "FIXME Long name", "Generic", "FIXME Description",
-      "FIXME <fixme@example.com>");
+      "This is the ROS2 node used in deepstream", "Generic", "FIXME Description",
+      "BinHU <hubin43@midea.com>");
 
   gobject_class->set_property = gst_dsrclpublisher_set_property;
   gobject_class->get_property = gst_dsrclpublisher_get_property;
@@ -480,3 +480,23 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     PACKAGE, 
     URL)
 
+
+#if 1
+/****************************************************************************************/
+GstDsRclPublisherNode::GstDsRclPublisherNode(const std::string& node_name, const std::string& topic_name)
+                      :rclcpp::Node(node_name)
+{
+    string_publisher = create_publisher<dsmsg::msg::Num>(topic_name, 1);
+}
+
+GstDsRclPublisherNode::~GstDsRclPublisherNode()
+{
+
+}
+
+void GstDsRclPublisherNode::Process(GstDsRclPublisherNode* node, const NvDsFrameMeta* data)
+{
+
+}
+
+#endif

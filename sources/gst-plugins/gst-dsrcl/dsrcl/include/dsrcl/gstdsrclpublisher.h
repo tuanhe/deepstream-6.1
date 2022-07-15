@@ -20,15 +20,9 @@
 #ifndef _GST_DSRCLPUBLISHER_H_
 #define _GST_DSRCLPUBLISHER_H_
 
-//#include <memory>
-//#include "rclcpp/rclcpp.hpp"
 //#include "ros2_deepstream_msgs/msg/nv_ds_meta_data.hpp"
 
-/* Open CV headers */
-// #include "opencv2/imgproc/imgproc.hpp"
-// #include "opencv2/highgui/highgui.hpp"
-
-
+#include <memory>
 #include <gst/base/gstbasetransform.h>
 #include <gst/video/video.h>
 #include <cuda.h>
@@ -38,6 +32,7 @@
 #include "gst-nvquery.h"
 #include "gstnvdsmeta.h"
 #include "rclcpp/rclcpp.hpp"
+#include "dsmsg/msg/num.hpp"  
 
 
 /* Package and library details required for plugin_init */
@@ -67,10 +62,12 @@ public:
   GstDsRclPublisherNode(const std::string& name, const std::string& topic_name);
   ~GstDsRclPublisherNode();
 
-  static void ProcessNewFrame(GstDsRclPublisherNode* node, const NvDsFrameMeta* data);
+  static void Process(GstDsRclPublisherNode* node, const NvDsFrameMeta* data);
 
+private:
   //void Publish(ros2_deepstream_msgs::msg::NvDsMetaData::UniquePtr msg);
-  //std::shared_ptr<rclcpp::Publisher<ros2_deepstream_msgs::msg::NvDsMetaData>> publisher_;
+  //std::shared_ptr<rclcpp::Publisher<NvDsMetaData>> string_publisher;
+  std::shared_ptr<rclcpp::Publisher<dsmsg::msg::Num>> string_publisher;
 };
 
 struct _GstDsRclPublisher
