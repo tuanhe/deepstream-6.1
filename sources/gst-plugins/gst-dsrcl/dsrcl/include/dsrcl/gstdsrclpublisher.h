@@ -1,81 +1,79 @@
-/* GStreamer
- * Copyright (C) 2022 FIXME <fixme@example.com>
+/**
+ * Copyright (c) 2017-2021, NVIDIA CORPORATION.  All rights reserved.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA 02110-1301, USA.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GST_DSRCLPUBLISHER_H_
-#define _GST_DSRCLPUBLISHER_H_
+#ifndef __GST_dsrclpublisher_H__
+#define __GST_dsrclpublisher_H__
 
-//#include "ros2_deepstream_msgs/msg/nv_ds_meta_data.hpp"
-
-#include <memory>
 #include <gst/base/gstbasetransform.h>
 #include <gst/video/video.h>
+
+/* Open CV headers */
+#pragma GCC diagnostic push
+#if __GNUC__ >= 8
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+#ifdef WITH_OPENCV
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#endif
+#pragma GCC diagnostic pop
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "nvbufsurface.h"
 #include "nvbufsurftransform.h"
 #include "gst-nvquery.h"
 #include "gstnvdsmeta.h"
-#include "rclcpp/rclcpp.hpp"
-#include "dsmsg/msg/num.hpp"  
-
+//#include "dsexample_lib/dsexample_lib.h"
 
 /* Package and library details required for plugin_init */
-#define PACKAGE "ds_rcl_publisher"
-#define VERSION "1.0"
+#define PACKAGE "hubin dsrclpublisher"
+#define VERSION "0.9"
 #define LICENSE "LGPL"
-#define DESCRIPTION "Publish NVDS meta data to a ROS2 topic"
-#define BINARY_PACKAGE "Publish NVDS meta data to a ROS2 topic"
+#define DESCRIPTION "hubin NVIDIA example plugin for integration with DeepStream on DGPU"
+#define BINARY_PACKAGE "hubin NVIDIA DeepStream 3rdparty IP integration example plugin"
 #define URL "https://github.com/tuanhe"
 
-G_BEGIN_DECLS
 
+G_BEGIN_DECLS
+/* Standard boilerplate stuff */
 typedef struct _GstDsRclPublisher GstDsRclPublisher;
 typedef struct _GstDsRclPublisherClass GstDsRclPublisherClass;
 
 /* Standard boilerplate stuff */
-#define GST_TYPE_DSRCLPUBLISHER   (gst_dsrclpublisher_get_type())
-#define GST_DSRCLPUBLISHER(obj)   (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_DSRCLPUBLISHER,GstDsRclPublisher))
-#define GST_DSRCLPUBLISHER_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_DSRCLPUBLISHER,GstDsRclPublisherClass))
-#define GST_DSRCLPUBLISHER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS((obj),GST_TYPE_DSRCLPUBLISHER,GstDsRclPublisherClass))
-#define GST_IS_DSRCLPUBLISHER(obj)   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_DSRCLPUBLISHER))
-#define GST_IS_DSRCLPUBLISHER_CLASS(obj)   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_DSRCLPUBLISHER))
+#define GST_TYPE_DSRCLPUBLISHER (gst_dsrclpublisher_get_type())
+#define GST_DSRCLPUBLISHER(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_DSRCLPUBLISHER,GstDsRclPublisher))
+#define GST_DSRCLPUBLISHER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_DSRCLPUBLISHER,GstDsRclPublisherClass))
+#define GST_DSRCLPUBLISHER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), GST_TYPE_DSRCLPUBLISHER, GstDsRclPublisherClass))
+#define GST_IS_dsrclpublisher(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_DSRCLPUBLISHER))
+#define GST_IS_dsrclpublisher_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_DSRCLPUBLISHER))
 #define GST_DSRCLPUBLISHER_CAST(obj)  ((GstDsRclPublisher *)(obj))
-
-class GstDsRclPublisherNode : public rclcpp::Node {
-public:
-  GstDsRclPublisherNode(const std::string& name, const std::string& topic_name);
-  ~GstDsRclPublisherNode();
-
-  static void Process(GstDsRclPublisherNode* node, const NvDsFrameMeta* data);
-
-private:
-  //void Publish(ros2_deepstream_msgs::msg::NvDsMetaData::UniquePtr msg);
-  //std::shared_ptr<rclcpp::Publisher<NvDsMetaData>> string_publisher;
-  std::shared_ptr<rclcpp::Publisher<dsmsg::msg::Num>> string_publisher;
-};
 
 struct _GstDsRclPublisher
 {
   GstBaseTransform base_trans;
 
   // Context of the custom algorithm library
-  std::unique_ptr<GstDsRclPublisherNode> node;
+  //DsExampleCtx *dsrclpublisherlib_ctx;
 
   // Unique ID of the element. The labels generated by the element will be
   // updated at index `unique_id` of attr_info array in NvDsObjectParams.
@@ -114,16 +112,15 @@ struct _GstDsRclPublisher
 
   // Boolean indicating if to blur the detected objects
   gboolean blur_objects;
-
 };
 
+// Boiler plate stuff
 struct _GstDsRclPublisherClass
 {
-  GstBaseTransformClass base_dsrclpublisher_class;
+  GstBaseTransformClass parent_class;
 };
 
 GType gst_dsrclpublisher_get_type (void);
 
 G_END_DECLS
-
-#endif
+#endif /* __GST_DSRCLPUBLISHER_H__ */

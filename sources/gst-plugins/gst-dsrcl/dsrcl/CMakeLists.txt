@@ -28,7 +28,7 @@ find_package(rclcpp REQUIRED)
 find_package(dsmsg REQUIRED)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(DSRCL REQUIRED gstreamer-1.0 gstreamer-base-1.0)
+pkg_check_modules(DSRCL REQUIRED gstreamer-1.0 gstreamer-base-1.0 gstreamer-video-1.0)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/include
@@ -46,13 +46,14 @@ link_directories(
 )
 
 set(ds_dependency_libraries
-    ${DSAPP_LIBRARIES}
+    ${DSRCL_LIBRARIES}
     nvdsgst_helper
     nvdsgst_meta
     nvds_meta
     nvbufsurface
     nvbufsurftransform
-    gstbase-1.0
+    #gstbase-1.0
+    cudart
 )
 
 add_library(dsrclpublisher SHARED src/gstdsrclpublisher.cpp)
