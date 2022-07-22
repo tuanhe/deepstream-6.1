@@ -244,6 +244,11 @@ gst_dsrclpublisher_init (GstDsRclPublisher * dsrclpublisher)
    * the buffer metadatas */
   if (!_dsmeta_quark)
     _dsmeta_quark = g_quark_from_static_string (NVDS_META_STRING);
+  
+  //rcl init
+  rclcpp::init(0, nullptr);
+  dsrclpublisher->node = std::make_unique<GstDsRclPublisherNode>("gst_ds_publisher", "metadata");
+
 }
 
 /* Function called when a property of the element is set. Standard boilerplate.
@@ -400,8 +405,7 @@ error:
     cudaStreamDestroy (dsrclpublisher->cuda_stream);
     dsrclpublisher->cuda_stream = NULL;
   }
-  //if (dsrclpublisher->dsrclpublisherlib_ctx)
-  //  DsExampleCtxDeinit (dsrclpublisher->dsrclpublisherlib_ctx);
+  
   return FALSE;
 }
 
@@ -427,10 +431,6 @@ gst_dsrclpublisher_stop (GstBaseTransform * btrans)
   }
 
   GST_DEBUG_OBJECT (dsrclpublisher, "deleted CV Mat \n");
-
-  /* Deinit the algorithm library */
-  //DsExampleCtxDeinit (dsrclpublisher->dsrclpublisherlib_ctx);
-  //dsrclpublisher->dsrclpublisherlib_ctx = NULL;
 
   GST_DEBUG_OBJECT (dsrclpublisher, "ctx lib released \n");
 
@@ -473,10 +473,15 @@ gst_dsrclpublisher_transform_ip (GstBaseTransform * btrans, GstBuffer * inbuf)
   guint i = 0;
 
   dsrclpublisher->frame_num++;
+  
+  //printf("%s  frame_cnt : %ld\n", __FUNCTION__,  dsrclpublisher->frame_num);
+  auto message = dsmsg::msg::Num();                              
+  message.num = dsrclpublisher->frame_num;                           
+  RCLCPP_INFO_STREAM(dsrclpublisher->node->get_logger(), "Publishing: '" << message.num << "'");
+  dsrclpublisher->node->publisher->publish(std::move(message));
+  
   CHECK_CUDA_STATUS (cudaSetDevice (dsrclpublisher->gpu_id),
       "Unable to set cuda device");
- 
-  printf("%s  frame_cnt : %ld  (comment out)\n", __FUNCTION__,  dsrclpublisher->frame_num);
   
   memset (&in_map_info, 0, sizeof (in_map_info));
   if (!gst_buffer_map (inbuf, &in_map_info, GST_MAP_READ)) {
@@ -531,3 +536,20 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     LICENSE, 
     BINARY_PACKAGE, 
     URL)
+
+/****************************************************************************************/
+GstDsRclPublisherNode::GstDsRclPublisherNode(const std::string& node_name, const std::string& topic_name)
+                      :rclcpp::Node(node_name)
+{
+    publisher = create_publisher<dsmsg::msg::Num>(topic_name, 10);
+}
+
+GstDsRclPublisherNode::~GstDsRclPublisherNode()
+{
+
+}
+
+void GstDsRclPublisherNode::Process(GstDsRclPublisherNode* node, const NvDsFrameMeta* data)
+{
+
+}
